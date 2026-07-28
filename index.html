@@ -3,11 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1e3a8a">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>Gestion Gana Ousmane</title>
 
 <style>
 /* Base */
-body{font-family:Arial;margin:0;background:#f4f6f9;color:#1f2937;}
+body{font-family:Arial;margin:0;background:#f4f6f9;color:#1f2937;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;}
 body.dark-mode{background:#0f172a;color:#e2e8f0;}
 body.dark-mode header{background:#0f172a;color:#f8fafc;}
 body.dark-mode .container{background:#111827;color:#e2e8f0;border:1px solid #27272a;}
@@ -27,6 +29,20 @@ header{background:#1e3a8a;color:white;text-align:center;padding:20px;position:re
 input{padding:8px;margin:5px;}
 button{padding:6px 10px;background:#1e3a8a;color:white;border:none;cursor:pointer;border-radius:4px;}
 button:hover{background:#162d66;}
+
+/* Mobile / touch improvements */
+@media (max-width: 600px) {
+    button{padding:12px 14px;font-size:16px;border-radius:8px;}
+    input{padding:10px;font-size:15px;}
+    .container{padding:12px;margin:10px;}
+    .burger-menu{top:12px;left:12px;font-size:28px;}
+    .photo-mini{width:40px;height:40px;}
+    .employee-card img{width:90px;height:90px;}
+    table thead {display:none;} /* simplify table view on very small devices */
+    table, tbody, tr, td {display:block;width:100%;}
+    tr{margin-bottom:12px;border-bottom:1px solid #e5e7eb;padding-bottom:12px;}
+    td{text-align:left;padding:6px 8px;border:none;}
+}
 
 /* Menu burger */
 .burger-menu{position:absolute;top:20px;left:20px;cursor:pointer;font-size:24px;background:none;border:none;color:white;z-index:1100;}
