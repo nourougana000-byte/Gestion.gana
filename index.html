@@ -69,7 +69,8 @@ button:hover{background:#162d66;}
     .burger-menu{font-size:26px;}
     .dashboard-grid{grid-template-columns:1fr;}
     .employee-card{padding:14px;}
-    .side-drawer{width:100% !important;}
+    /* Keep drawer closed by default on mobile; openDrawer() will set width when needed */
+    .side-drawer{width:0;}
 }
 
 /* Employés */
@@ -1072,7 +1073,12 @@ function logGlobal(desc){
 /* GESTION DU MENU BURGER ET VUES */
 function openDrawer(){
     if(!requireLogin()) return;
-    document.getElementById("sideDrawer").style.width = "250px";
+    const sd = document.getElementById("sideDrawer");
+    if(window.innerWidth <= 900){
+        sd.style.width = "100%"; // full-screen drawer on small devices
+    } else {
+        sd.style.width = "250px";
+    }
 }
 function closeDrawer(){
     document.getElementById("sideDrawer").style.width = "0";
