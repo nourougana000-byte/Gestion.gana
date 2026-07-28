@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin - Gestion Gana Ousmane</title>
+  <style>
+    body{font-family:Arial;margin:0;background:#f4f6f9;padding:20px}
+    .container{max-width:1100px;margin:0 auto;background:#fff;padding:20px;border-radius:8px}
+    h1{color:#1e3a8a}
+    button{padding:6px 10px;background:#1e3a8a;color:#fff;border:none;border-radius:6px;cursor:pointer}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{border:1px solid #ddd;padding:8px;text-align:left}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Tableau d'administration</h1>
+    <p id="who"></p>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+      <input id="emailInput" placeholder="email" style="padding:6px">
+      <select id="roleSelect" style="padding:6px">
+        <option value="admin">Admin</option>
+        <option value="manager">Manager</option>
+        <option value="viewer">Viewer</option>
+      </select>
+      <button id="addUserBtn">Ajouter utilisateur</button>
+      <button id="exportBtn">Exporter</button>
+      <button id="restoreBtn">Restaurer</button>
+      <button id="resetBtn" style="background:#b91c1c">Réinitialiser</button>
+      <button id="homeBtn" style="background:#0ea5a4">Retour accueil</button>
+      <button id="logoutBtn" style="background:#666">Déconnexion</button>
+    </div>
+
+    <input type="file" id="fileRestore" accept="application/json" style="display:none">
+
+    <h3>Utilisateurs</h3>
+    <table id="usersTableAdmin">
+      <thead><tr><th>Email</th><th>Rôle</th><th>Actions</th></tr></thead>
+      <tbody id="usersTbodyAdmin"></tbody>
+    </table>
+
+    <h3 style="margin-top:18px">Résumé</h3>
+    <p id="summary"></p>
+  </div>
+
+  <script>
+    // Check admin session
+    const currentEmail = sessionStorage.getItem('currentUserEmail') || '';
+    const currentRole = sessionStorage.getItem('currentUserRole') || '';
+    if(!currentEmail || currentRole !== 'admin'){
+      // not authorized -> back to index
+      alert('Accès administrateur requis. Redirection vers la page principale.');
+      window.location.href = 'index.html';
+    }
+
+    document.getElementById('who').textContent = 'Connecté en tant que: ' + currentEmail + ' (' + currentRole + ')';
+
+    const OWNER_EMAIL = 'nourougana888@gmail.com';
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+    // Si aucun utilisateur n'existe encore, créer automatiquement le propriétaire en tant qu'admin
+    if(!users || users.length === 0){
+      users = [{ email: OWNER_EMAIL, role: 'admin' }];
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+    let employes = JSON.parse(localStorage.getItem('employes')) || [];
+    let globalHistory = JSON.parse(localStorage.getItem('globalHistory')) || [];
+
+    function render(){
+      const tbody = document.getElementById('usersTbodyAdmin');
+      tbody.innerHTML = '';
+      users.forEach(u=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${u.email}</td><td>${u.role}</td><td><button data-email="${u.email}" class="del">Supprimer</button></td>`;
+        tbody.appendChild(tr);
+      });
+      document.querySelectorAll('#usersTbodyAdmin .del').forEach(b=>b.addEventListener('click',e=>{
+        const email = e.target.getAttribute('data-email');
+        if(!confirm('Supprimer '+email+' ?')) return;
+        users = users.filter(x=>x.email.toLowerCase()!==email.toLowerCase());
+        localStorage.setItem('users', JSON.stringify(users));
+        render();
+      }));
+
+      document.getElementById('summary').textContent = `Employés: ${employes.length} — Historique: ${globalHistory.length} — Utilisateurs: ${users.length}`;
+    }
+
+    document.getElementById('addUserBtn').addEventListener('click', ()=>{
+      const email = (document.getElementById('emailInput').value || '').trim().toLowerCase();
+      const role = document.getElementById('roleSelect').value;
+      if(!email){ alert('Email requis'); return; }
+      if(users.find(u=>u.email===email)){ alert('Utilisateur déjà existant'); return; }
+      users.push({email, role});
+      localStorage.setItem('users', JSON.stringify(users));
+      document.getElementById('emailInput').value = '';
+      render();
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', ()=>{
+      const payload = {users, employes, globalHistory, date:new Date().toISOString()};
+      const blob = new Blob([JSON.stringify(payload, null,2)], {type:'application/json'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'backup_admin_'+Date.now()+'.json'; document.body.appendChild(a); a.click(); a.remove();
+    });
+
+    document.getElementById('restoreBtn').addEventListener('click', ()=>document.getElementById('fileRestore').click());
+    document.getElementById('fileRestore').addEventListener('change', e=>{
+      const f = e.target.files[0]; if(!f) return; const reader = new FileReader(); reader.onload = ev=>{
+        try{
+          const d = JSON.parse(ev.target.result);
+          if(Array.isArray(d.users)) users = d.users;
+          if(Array.isArray(d.employes)) employes = d.employes;
+          if(Array.isArray(d.globalHistory)) globalHistory = d.globalHistory;
+          localStorage.setItem('users', JSON.stringify(users));
+          localStorage.setItem('employes', JSON.stringify(employes));
+          localStorage.setItem('globalHistory', JSON.stringify(globalHistory));
+          alert('Restauration OK'); render();
+        }catch(err){ alert('Fichier invalide'); }
+      }; reader.readAsText(f);
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', ()=>{
+      if(!confirm('Confirmer la réinitialisation complète ?')) return; localStorage.removeItem('users'); localStorage.removeItem('employes'); localStorage.removeItem('globalHistory'); users=[]; employes=[]; globalHistory=[]; render(); alert('Réinitialisé');
+    });
+
+    document.getElementById('homeBtn').addEventListener('click', ()=>{
+      window.location.href = 'index.html';
+    });
+    document.getElementById('logoutBtn').addEventListener('click', ()=>{
+      sessionStorage.removeItem('isAdmin'); sessionStorage.removeItem('currentUserEmail'); sessionStorage.removeItem('currentUserRole'); window.location.href = 'index.html';
+    });
+
+    render();
+  </script>
+</body>
+</html>
