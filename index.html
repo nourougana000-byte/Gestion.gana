@@ -1,3 +1,513 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1e3a8a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Gestion Gana Ousmane</title>
+
+<style>
+/* Base */
+body{font-family:Arial;margin:0;background:#f4f6f9;color:#1f2937;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;}
+body.dark-mode{background:#0f172a;color:#e2e8f0;}
+body.dark-mode header{background:#0f172a;color:#f8fafc;}
+body.dark-mode .container{background:#111827;color:#e2e8f0;border:1px solid #27272a;}
+body.dark-mode .view-section{color:#e2e8f0;}
+body.dark-mode .dashboard-card, body.dark-mode .employee-card, body.dark-mode .modal-content, body.dark-mode .facture-scope .document-a4{background:#111827;}
+body.dark-mode .side-drawer{background:#0f172a;}
+body.dark-mode .side-drawer a{color:#e2e8f0;}
+body.dark-mode .side-drawer a:hover{background:#1e293b;}
+body.dark-mode th, body.dark-mode td{border-color:#334155;color:#e2e8f0;}
+body.dark-mode th{background:#1f2937;}
+body.dark-mode table{background:#111827;}
+body.dark-mode input{background:#1f2937;color:#e2e8f0;border:1px solid #334155;}
+body.dark-mode button{background:#2563eb;color:white;}
+body.dark-mode button:hover{background:#1d4ed8;}
+header{background:#1e3a8a;color:white;text-align:center;padding:20px;position:relative;}
+.container{width:95%;max-width:1100px;margin:20px auto;background:white;padding:20px;border-radius:10px;}
+input{padding:8px;margin:5px;}
+button{padding:6px 10px;background:#1e3a8a;color:white;border:none;cursor:pointer;border-radius:4px;}
+button:hover{background:#162d66;}
+
+/* Mobile / touch improvements */
+@media (max-width: 600px) {
+    body{font-size:13px;}
+    header{padding:10px;}
+    header h2{font-size:16px;margin:0;}
+    header p{font-size:11px;margin:3px 0 0 0;}
+    button{padding:6px 8px;font-size:13px;border-radius:6px;}
+    input{padding:6px;font-size:13px;}
+    .container{padding:8px;margin:6px;}
+    .burger-menu{top:8px;left:8px;font-size:22px;display:block;z-index:2000;width:38px;height:38px;border-radius:6px;background:rgba(0,0,0,0.08);}
+    .photo-mini{width:30px;height:30px;}
+    .employee-card img{width:60px;height:60px;}
+    table thead {display:none;} /* simplify table view on very small devices */
+    table, tbody, tr, td {display:block;width:100%;}
+    tr{margin-bottom:12px;border-bottom:1px solid #e5e7eb;padding-bottom:12px;}
+    td{text-align:left;padding:6px 8px;border:none;}
+    .side-drawer a{font-size:16px;padding:10px 14px;}
+    /* Make the printed-style invoice responsive on phones */
+    .facture-scope .document-a4{width:100%;min-height:unset;padding:8mm;box-shadow:none;}
+    .facture-scope .company-name{font-size:28px;}
+    .facture-scope .header svg{width:80px;height:80px;}
+    .facture-scope .client-box{font-size:18px;padding:6px 10px;min-width:160px;}
+    /* hide fixed adminBar on small screens, use drawer controls */
+    #adminBar{display:none !important;}
+    #drawerAdminControls{display:block;}
+}
+
+/* Tablet / small phones (broader rules) */
+@media (max-width: 768px) {
+    html, body { -webkit-text-size-adjust: 100%; }
+    body{font-size:14px;}
+    h2, h3, h4 {line-height:1.1}
+    header{padding:12px;}
+    header h2{font-size:18px;}
+    header p{font-size:12px;}
+    button{padding:7px 9px;font-size:14px;}
+    input{padding:7px;font-size:14px;}
+    .container{padding:12px;margin:10px;}
+    .dashboard-card{padding:12px;border-radius:8px;}
+    .dashboard-card h4{font-size:16px}
+    .dashboard-card p{font-size:14px}
+    .cards-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));}
+    .employee-card{padding:12px}
+    .employee-card img{width:60px;height:60px}
+    /* Make tables horizontally scrollable on small screens */
+    .table-responsive{overflow-x:auto;-webkit-overflow-scrolling:touch;-ms-overflow-style:-ms-autohiding-scrollbar;}
+    .table-responsive table{width:100%;min-width:520px;border-collapse:collapse}
+    /* Side-drawer should not occupy full screen on tablets/phones */
+    .side-drawer{width:0}
+}
+
+/* Menu burger */
+.burger-menu{position:absolute;top:20px;left:20px;cursor:pointer;font-size:24px;background:none;border:none;color:white;z-index:1100;}
+.side-drawer{height:100%;width:0;position:fixed;z-index:2000;top:0;left:0;background-color:#1e3a8a;overflow-x:hidden;transition:0.3s;padding-top:60px;box-shadow:2px 0 5px rgba(0,0,0,0.5);}
+.side-drawer a{padding:12px 24px;text-decoration:none;font-size:18px;color:white;display:block;transition:0.2s;}
+.side-drawer a:hover{background:#162d66;}
+.side-drawer .close-drawer{position:absolute;top:15px;right:20px;font-size:24px;cursor:pointer;color:white;}
+
+/* Drawer admin controls (visible on mobile) */
+.side-drawer .drawer-admin{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.side-drawer .drawer-admin .badge{display:inline-block;padding:6px 8px;background:#0ea5a4;color:#fff;border-radius:6px;font-weight:bold;margin-bottom:8px;}
+.side-drawer .drawer-admin button{display:inline-block;background:rgba(255,255,255,0.08);color:white;border:none;padding:6px 8px;border-radius:6px;margin-right:6px;margin-top:6px;cursor:pointer}
+
+/* Vues */
+.view-section{display:none;}
+.view-section.active{display:block;}
+
+.dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px;margin-top:20px;}
+.dashboard-card{background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;box-shadow:0 2px 12px rgba(0,0,0,0.06);}
+.dashboard-card h4{margin:0 0 8px;color:#1e3a8a;font-size:18px;}
+.dashboard-card p{margin:0;font-size:16px;color:#334155;}
+.notifications-bar{display:none;padding:12px 14px;margin-bottom:16px;border-radius:10px;font-weight:600;}
+.notifications-bar.success{background:#d1fae5;color:#065f46;}
+.notifications-bar.warning{background:#fef3c7;color:#92400e;}
+.notifications-bar.error{background:#fee2e2;color:#b91c1c;}
+
+@media (max-width: 900px) {
+    .container{padding:15px;}
+    .burger-menu{font-size:26px;}
+    .dashboard-grid{grid-template-columns:1fr;}
+    .employee-card{padding:14px;}
+    /* Keep drawer closed by default on mobile; openDrawer() will set width when needed */
+    .side-drawer{width:0;}
+}
+
+/* Employés */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:15px;margin-top:20px;}
+.employee-card{background:#fff;border:1px solid #ddd;border-radius:8px;padding:15px;text-align:center;box-shadow:0 2px 5px rgba(0,0,0,0.05);}
+.employee-card img{width:70px;height:70px;border-radius:50%;object-fit:cover;margin-bottom:10px;}
+table{width:100%;border-collapse:collapse;margin-top:20px;}
+th,td{border:1px solid #ccc;padding:8px;text-align:center;}
+th{background:#1e3a8a;color:white;}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:2500;}
+.modal-content{background:white;margin:100px auto;padding:20px;width:90%;max-width:600px;border-radius:10px;max-height:80vh;overflow-y:auto;}
+.close{float:right;cursor:pointer;color:red;font-size:20px;}
+.photo-mini{width:35px;height:35px;border-radius:50%;vertical-align:middle;margin-right:6px;object-fit:cover;}
+
+/* Facture */
+.facture-scope * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    box-sizing: border-box;
+}
+.facture-scope {
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    margin: 0;
+    font-family: "Times New Roman", Times, serif;
+}
+.facture-scope .document-a4 {
+    width: 210mm;
+    min-height: 297mm;
+    background: white;
+    padding: 20mm 15mm 25mm 15mm;
+    box-sizing: border-box;
+    color: black;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    position: relative;
+}
+.facture-scope [contenteditable="true"] {
+    outline: none;
+    transition: background-color 0.2s;
+    border-radius: 3px;
+}
+.facture-scope [contenteditable="true"]:hover {
+    background-color: rgba(22, 110, 54, 0.08);
+    cursor: text;
+}
+.facture-scope [contenteditable="true"]:focus {
+    background-color: rgba(22, 110, 54, 0.15);
+}
+.facture-scope .header {
+    font-family: Arial, sans-serif;
+    margin-bottom: 30px;
+    width: 100%;
+}
+.facture-scope .header-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+}
+.facture-scope .header-table td {
+    border: none;
+    padding: 0;
+    vertical-align: middle;
+}
+.facture-scope .company-name {
+    color: #166e36;
+    font-size: 44px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    line-height: 1.1;
+}
+.facture-scope .activities-container {
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 5px 0;
+    background-color: #fbfbfb;
+    margin-top: 10px;
+}
+.facture-scope .activities {
+    color: #166e36;
+    font-size: 11px;
+    font-style: italic;
+    font-weight: bold;
+    text-align: left;
+    line-height: 1.4;
+}
+.facture-scope .info-section {
+    display: block;
+    text-align: right;
+    margin-bottom: 25px;
+    font-family: "Times New Roman", Times, serif;
+}
+.facture-scope .date {
+    font-size: 14px;
+    margin-bottom: 10px;
+    padding: 2px 5px;
+    display: inline-block;
+}
+.facture-scope .client-box-wrapper {
+    text-align: right;
+    margin-top: 5px;
+}
+.facture-scope .client-box {
+    display: inline-block;
+    border: 3px solid black;
+    padding: 8px 20px;
+    font-family: Arial, sans-serif;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    min-width: 250px;
+}
+.facture-scope .document-title {
+    font-size: 20px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+.facture-scope .document-subject {
+    text-align: center;
+    font-size: 16px;
+    margin-bottom: 20px;
+    line-height: 1.3;
+}
+.facture-scope .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+.facture-scope .data-table th, .facture-scope .data-table td {
+    border: 1px solid black;
+    padding: 6px;
+}
+.facture-scope .data-table th {
+    font-family: "Times New Roman", Times, serif;
+    font-weight: bold;
+    text-align: center;
+}
+.facture-scope .designation-col {
+    width: 55%;
+    text-align: left;
+    vertical-align: top;
+    padding-left: 10px;
+}
+.facture-scope .center-col {
+    text-align: center;
+    vertical-align: middle;
+}
+.facture-scope .right-col {
+    text-align: right;
+    font-weight: bold;
+    padding-right: 15px;
+}
+.facture-scope .bold-val {
+    font-weight: bold;
+    text-align: center;
+}
+.facture-scope .amount-words {
+    font-size: 13px;
+    margin-top: 15px;
+    padding-left: 10px;
+    margin-bottom: 25px;
+    line-height: 1.4;
+}
+.facture-scope .stamp-section {
+    text-align: right;
+    margin-top: 15px;
+    margin-right: 20px;
+    margin-bottom: 40px;
+}
+.facture-scope .stamp-container {
+    display: inline-block;
+    text-align: center;
+}
+.facture-scope .stamp-title {
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    text-decoration: underline;
+    margin-bottom: 5px;
+    display: block;
+}
+.facture-scope .stamp-image {
+    width: 220px;
+    height: auto;
+    display: block;
+    margin-left: auto;
+}
+.facture-scope .footer {
+    position: absolute;
+    bottom: 15mm;
+    left: 15mm;
+    right: 15mm;
+    border-top: 2px solid #166e36;
+    border-bottom: 2px solid #166e36;
+    padding: 5px 0;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    font-size: 9.5px;
+    color: #166e36;
+    font-weight: bold;
+    line-height: 1.4;
+}
+@media print {
+    body {
+        background-color: white;
+        padding: 0;
+        display: block;
+        margin: 0;
+    }
+    header,
+    .burger-menu,
+    .side-drawer,
+    .modal,
+    .view-section:not(#view-facture) {
+        display: none !important;
+    }
+    .container {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        background: white;
+        box-shadow: none;
+        border: none;
+    }
+    #view-facture {
+        display: block !important;
+    }
+    .facture-scope {
+        padding: 0;
+        background: white;
+        display: block;
+    }
+    .facture-scope .document-a4 {
+        width: 100%;
+        min-height: auto;
+        box-shadow: none;
+        padding: 0;
+        overflow: visible;
+    }
+    .facture-scope .data-table,
+    .facture-scope .stamp-section,
+    .facture-scope .footer {
+        page-break-inside: avoid;
+    }
+    .facture-scope .company-name {
+        font-size: 28px;
+    }
+    .facture-scope .client-box {
+        font-size: 18px;
+        min-width: 180px;
+        padding: 6px 12px;
+    }
+    .facture-scope .document-title {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+    .facture-scope .document-subject {
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+    .facture-scope .data-table {
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+    .facture-scope .amount-words {
+        font-size: 12px;
+        margin-top: 8px;
+        margin-bottom: 10px;
+    }
+    .facture-scope .stamp-image {
+        width: 140px;
+    }
+    .facture-scope .footer {
+        position: static;
+        margin-top: 10px;
+        font-size: 7px;
+        line-height: 1.2;
+        padding: 4px 0;
+    }
+    @page {
+        size: A4;
+        margin: 8mm 8mm 8mm 8mm;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- MENU BURGER -->
+<button class="burger-menu" onclick="openDrawer()">&#9776;</button>
+
+<div id="sideDrawer" class="side-drawer">
+<span class="close-drawer" onclick="closeDrawer()">&times;</span>
+    <div id="drawerAdminControls" class="drawer-admin" style="display:none;">
+        <div id="drawerUserBadges"></div>
+        <div style="margin-top:6px;">
+            <button id="drawerAdminButton" onclick="openAdminModal()">Connexion Admin</button>
+            <button id="drawerLoginButton" onclick="openLoginModal()">Se connecter</button>
+            <button id="drawerThemeBtn" onclick="toggleTheme()">Mode sombre</button>
+            <button id="drawerAdminLogout" onclick="logoutAdmin()" style="display:none;">Déconnexion Admin</button>
+            <button id="drawerUserLogout" onclick="logoutUser()" style="display:none;">Déconnexion</button>
+        </div>
+    </div>
+<a href="#" onclick="switchView('dashboard')">🏠 Tableau de bord</a>
+<a href="#" onclick="switchView('table')">📊 Tableau Employés</a>
+<a href="#" onclick="switchView('cards')">👥 Cartes Employé</a>
+<a href="#" onclick="switchView('globalHistory')">📜 Historique</a>
+<a href="#" id="link-addEmployee" onclick="switchView('addEmployee')">➕ Ajouter un Employé</a>
+<a href="#" onclick="switchView('facture')">📄 Facture</a>
+</div>
+
+<header>
+<h2>GESTION GANA OUSMANE SARL</h2>
+<p>27 21 72 41 77 | contact@estganaousmanesarl.com | 11 BP 2399 Abidjan 11</p>
+</header>
+
+<!-- Administration badge and button -->
+<div id="adminBar" style="position:fixed;top:18px;right:18px;z-index:1200;display:flex;gap:8px;align-items:center;">
+    <span id="adminBadge" style="display:none;padding:6px 10px;background:#166e36;color:#fff;border-radius:6px;font-weight:bold;font-size:13px;">Mode Administrateur</span>
+    <span id="userBadge" style="display:none;padding:6px 10px;background:#0ea5a4;color:#fff;border-radius:6px;font-weight:bold;font-size:13px;"></span>
+    
+    <button id="adminButton" style="display:inline-block;background:#d946ef;padding:6px 10px;border-radius:6px;color:#fff;border:none;cursor:pointer;">Connexion Admin</button>
+    <button id="loginButton" style="display:none;background:#0ea5a4;padding:6px 10px;border-radius:6px;color:#fff;border:none;cursor:pointer;">Se connecter</button>
+    <button id="themeToggleBtn" style="display:inline-block;background:#f59e0b;padding:6px 10px;border-radius:6px;color:#fff;border:none;cursor:pointer;">Mode sombre</button>
+    <button id="adminLogout" style="display:none;background:#ef4444;padding:6px 10px;border-radius:6px;color:#fff;border:none;cursor:pointer;">Déconnexion Admin</button>
+    <button id="userLogout" style="display:none;background:#6b7280;padding:6px 10px;border-radius:6px;color:#fff;border:none;cursor:pointer;">Déconnexion</button>
+</div>
+
+<main class="container">
+<div id="notificationBar" class="notifications-bar"></div>
+
+<!-- VUE 0 : DASHBOARD -->
+<div id="view-dashboard" class="view-section">
+    <h3>🏠 Tableau de bord</h3>
+    <div id="dashboardGrid" class="dashboard-grid"></div>
+    <div style="margin-top:20px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+        <button onclick="renderDashboard()">Actualiser</button>
+        <button onclick="showLowBalance(50000)">Voir solde < 50 000</button>
+    </div>
+</div>
+
+<!-- VUE 1 : TABLEAU CLASSIQUE -->
+<div id="view-table" class="view-section active">
+<h3>🔎 Recherche Employé</h3>
+<input type="text" id="searchInput" placeholder="Rechercher par nom ou prénom" oninput="searchEmploye()">
+<button onclick="searchEmploye()">Rechercher</button>
+<button onclick="afficher()">Réinitialiser</button>
+
+<hr>
+
+<h3>Liste des Employés</h3>
+
+<div class="table-responsive">
+<table>
+<thead>
+<tr>
+<th>Nom</th>
+<th>Prénom</th>
+<th>Salaire</th>
+<th>Total Reçu</th>
+<th>Reste</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="employeTable"></tbody>
+</table>
+</div>
+</div>
+
+<!-- VUE 2 : CARTES EMPLOYÉS -->
+<div id="view-cards" class="view-section">
+<h3>Liste des Employés (Cartes)</h3>
+<div id="cardsGrid" class="cards-grid"></div>
+</div>
+
+<!-- VUE 3 : HISTORIQUE GLOBAL -->
+<div id="view-globalHistory" class="view-section">
+<h3>Historique Global de l'Entreprise</h3>
+<div id="globalHistoryContent"></div>
+</div>
+
+<!-- VUE 4 : AJOUTER EMPLOYÉ -->
+<div id="view-addEmployee" class="view-section">
+<h3>Ajouter un Employé</h3>
+Nom <input type="text" id="nom"><br>
+Prénom <input type="text" id="prenom"><br>
+Salaire Base <input type="number" id="salaire" value="75000"><br>
+Photo <input type="file" id="photo" accept="image/*"><br>
+<button onclick="ajouterEmploye()">Ajouter</button>
+</div>
+
 <!-- VUE 5 : FACTURE -->
 <div id="view-facture" class="view-section">
     <div class="facture-scope">
@@ -46,6 +556,7 @@
                 <u><em>Objet :</em></u> <span contenteditable="true">VIDANGE DES FOSSES SEPTIQUES DES BUREAUX<br>ADMINISTRATIFS</span>
             </div>
 
+            <div class="table-responsive">
             <table class="data-table">
                 <thead>
                     <tr>
@@ -93,6 +604,7 @@
                     </tr>
                 </tbody>
             </table>
+            </div>
 
             <div class="amount-words">
                 <strong>Arrêté le présent devis à la somme de : <span contenteditable="true">DEUX CENT SOIXANTE ONZE MILLE QUATRE CENT<br>FRANCS CFA</span></strong>
@@ -115,3 +627,949 @@
     </div>
 </div>
 </main>
+
+<!-- MODAL HISTORIQUE -->
+<div class="modal" id="historyModal">
+<div class="modal-content">
+<span class="close" onclick="fermerHistorique()">&times;</span>
+<h3>Historique des Transactions</h3>
+<div id="historyContent"></div>
+</div>
+</div>
+
+<!-- ADMIN PASSWORD MODAL -->
+<div class="modal" id="adminModal">
+    <div class="modal-content">
+        <span class="close" onclick="closeAdminModal()">&times;</span>
+        <h3>Accès Administrateur</h3>
+        <p>Entrez le mot de passe administrateur :</p>
+        <input type="password" id="adminPasswordInput" style="width:100%;padding:8px;margin:8px 0;">
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+            <button onclick="verifyAdminPassword()">Valider</button>
+            <button onclick="closeAdminModal()" style="background:#ccc;color:#000;">Annuler</button>
+        </div>
+        <p id="adminError" style="color:red;display:none;margin-top:8px;"></p>
+    </div>
+</div>
+
+<!-- ADMIN VIEW (accessible seulement aux admins) -->
+<div id="view-admin" class="view-section">
+    <h3>🔐 Panneau d'administration</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;">
+        <button onclick="resetAllData()" id="btnReset">Réinitialiser toutes les données</button>
+        <button onclick="exportData()" id="btnExport">Exporter les données</button>
+        <label style="display:inline-block;">
+            <input type="file" id="restoreFileInput" accept="application/json" style="display:none" onchange="restoreFromFile(event)">
+            <button onclick="document.getElementById('restoreFileInput').click()" id="btnRestore">Restaurer une sauvegarde</button>
+        </label>
+        <button onclick="switchView('table')">Retour au tableau</button>
+        <button onclick="logoutAdmin()" style="background:#ef4444;" id="btnLogoutSmall">Déconnexion Admin</button>
+    </div>
+    <hr>
+    <p style="font-size:13px;color:#444;">Actions sensibles visibles uniquement en mode administrateur :</p>
+</div>
+
+    <!-- LOGIN MODAL (par e-mail) -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeLoginModal()">&times;</span>
+            <h3>Connexion utilisateur</h3>
+            <p>Entrez votre email pour vous connecter :</p>
+            <input type="email" id="loginEmailInput" style="width:100%;padding:8px;margin:8px 0;" placeholder="email@exemple.com">
+            <div style="display:flex;gap:8px;justify-content:flex-end;">
+                <button onclick="loginByEmail()">Se connecter</button>
+            </div>
+            <p id="loginError" style="color:red;display:none;margin-top:8px;"></p>
+        </div>
+    </div>
+
+    <!-- USER MANAGEMENT inside admin view -->
+    <style>#usersTable td, #usersTable th{padding:6px;border:1px solid #ddd;}</style>
+    <div id="adminUserManagement" style="display:none;max-width:900px;margin:12px 0;">
+        <h4>Gestion des utilisateurs</h4>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+            <input type="email" id="newUserEmail" placeholder="email" style="padding:6px;">
+            <select id="newUserRole" style="padding:6px;">
+                <option value="admin">Admin</option>
+                <option value="manager">Manager</option>
+                <option value="viewer">Viewer</option>
+            </select>
+            <button onclick="addUserFromAdmin()">Ajouter utilisateur</button>
+        </div>
+        <table id="usersTable" style="width:100%;border-collapse:collapse;">
+            <thead><tr><th>Email</th><th>Rôle</th><th>Actions</th></tr></thead>
+            <tbody id="usersTbody"></tbody>
+        </table>
+    </div>
+
+<script>
+
+// Admin configuration
+const ADMIN_PASSWORD = "123456"; // Modifier ici le mot de passe administrateur
+const OWNER_EMAIL = 'nourougana888@gmail.com'; // Propriétaire/gérant — connexion automatique en admin
+
+// Users stored in localStorage
+let users = JSON.parse(localStorage.getItem('users')) || [];
+
+// Si aucun utilisateur n'existe encore, créer automatiquement le propriétaire en tant qu'admin
+if(!users || users.length === 0){
+    users = [{ email: OWNER_EMAIL, role: 'admin' }];
+    localStorage.setItem('users', JSON.stringify(users));
+    console.log('Utilisateur propriétaire créé automatiquement:', OWNER_EMAIL);
+}
+
+// Session: use sessionStorage so session ends when navigateur fermé
+function isAdmin(){
+    return sessionStorage.getItem('isAdmin') === '1' || getCurrentRole() === 'admin';
+}
+
+function setAdminState(flag){
+    if(flag){
+        sessionStorage.setItem('isAdmin','1');
+    } else {
+        sessionStorage.removeItem('isAdmin');
+    }
+    updateAdminUI();
+}
+
+function getCurrentRole(){
+    return sessionStorage.getItem('currentUserRole') || 'viewer';
+}
+
+function getCurrentEmail(){
+    return sessionStorage.getItem('currentUserEmail') || '';
+}
+
+function isLoggedIn(){
+    return !!getCurrentEmail();
+}
+
+function requireLogin(){
+    if(!isLoggedIn()){
+        openLoginModal();
+        return false;
+    }
+    return true;
+}
+
+// Permissions mapping
+const PERMISSIONS = {
+    admin: ['reset','delete','add','modify','modify_devis','restore','export','retrait','depot','print_invoice'],
+    manager: ['add','modify','retrait','depot'],
+    viewer: []
+};
+const THEME_KEY = 'themeMode';
+
+function hasPrivilege(action){
+    const role = getCurrentRole();
+    return Array.isArray(PERMISSIONS[role]) && PERMISSIONS[role].includes(action);
+}
+
+function setCurrentUser(email, role){
+    if(email) sessionStorage.setItem('currentUserEmail', email); else sessionStorage.removeItem('currentUserEmail');
+    if(role) sessionStorage.setItem('currentUserRole', role); else sessionStorage.removeItem('currentUserRole');
+    // synchronize isAdmin flag
+    if(role === 'admin') sessionStorage.setItem('isAdmin','1'); else sessionStorage.removeItem('isAdmin');
+    updateAdminUI();
+}
+
+function updateAdminUI(){
+    // Show/hide admin badge and logout
+    const adminBadgeEl = document.getElementById('adminBadge');
+    const adminLogoutEl = document.getElementById('adminLogout');
+    const adminButton = document.getElementById('adminButton');
+    const userBadge = document.getElementById('userBadge');
+    const loginBtn = document.getElementById('loginButton');
+    const userLogout = document.getElementById('userLogout');
+    const email = getCurrentEmail();
+    const loggedIn = !!email;
+    if(adminBadgeEl) adminBadgeEl.style.display = isAdmin() ? 'inline-block' : 'none';
+    if(adminLogoutEl) adminLogoutEl.style.display = isAdmin() ? 'inline-block' : 'none';
+    if(adminButton) adminButton.style.display = !loggedIn || isAdmin() ? 'inline-block' : 'none';
+    const loginBtnEl = loginBtn;
+    if(email){
+        if(userBadge) { userBadge.style.display = 'inline-block'; userBadge.textContent = email; }
+        if(loginBtnEl) loginBtnEl.style.display = 'none';
+        if(userLogout) userLogout.style.display = 'inline-block';
+    } else {
+        if(userBadge) userBadge.style.display = 'none';
+        if(loginBtnEl) loginBtnEl.style.display = 'inline-block';
+        if(userLogout) userLogout.style.display = 'none';
+        if(adminButton) adminButton.style.display = 'inline-block';
+    }
+    // Show/hide add employee link depending on privilege
+    const addLink = document.getElementById('link-addEmployee');
+    if(addLink) addLink.style.display = hasPrivilege('add')? 'block' : 'none';
+    // Toggle contenteditable for invoice fields
+    document.querySelectorAll('.facture-scope [contenteditable]').forEach(el=>{
+        el.setAttribute('contenteditable', hasPrivilege('modify_devis'));
+    });
+    // Print button removed from facture view
+    // Show/hide admin user management section
+    const adminUserManagementEl = document.getElementById('adminUserManagement');
+    if(adminUserManagementEl) adminUserManagementEl.style.display = isAdmin() ? 'block' : 'none';
+    renderUsersList();
+    // Sync drawer admin controls (mobile)
+    const drawer = document.getElementById('drawerAdminControls');
+    if(drawer){
+        const dUserBadges = document.getElementById('drawerUserBadges');
+        const dAdminBtn = document.getElementById('drawerAdminButton');
+        const dLoginBtn = document.getElementById('drawerLoginButton');
+        const dThemeBtn = document.getElementById('drawerThemeBtn');
+        const dAdminLogout = document.getElementById('drawerAdminLogout');
+        const dUserLogout = document.getElementById('drawerUserLogout');
+        // Show drawer controls only on narrow screens
+        drawer.style.display = window.innerWidth <= 600 ? 'block' : 'none';
+        if(dUserBadges) dUserBadges.innerHTML = email ? `<span class="badge">${email}</span>` : '';
+        if(dAdminBtn) dAdminBtn.style.display = (!loggedIn || isAdmin()) ? 'inline-block' : 'none';
+        if(dLoginBtn) dLoginBtn.style.display = loggedIn ? 'none' : 'inline-block';
+        if(dAdminLogout) dAdminLogout.style.display = isAdmin() ? 'inline-block' : 'none';
+        if(dUserLogout) dUserLogout.style.display = loggedIn ? 'inline-block' : 'none';
+        if(dThemeBtn) dThemeBtn.textContent = (localStorage.getItem(THEME_KEY) === 'dark') ? 'Mode clair' : 'Mode sombre';
+    }
+    // If currently showing admin view but not admin, switch back to table
+    if(!isAdmin() && document.getElementById('view-admin').classList.contains('active')){
+        switchView('table');
+    }
+    // Re-render to refresh buttons visibility
+    renderTable(employes);
+    renderCards();
+    if(document.getElementById('view-dashboard')?.classList.contains('active')){
+        renderDashboard();
+    }
+}
+
+function showNotification(message, type = 'success'){
+    const bar = document.getElementById('notificationBar');
+    if(!bar) return;
+    bar.className = `notifications-bar ${type}`;
+    bar.textContent = message;
+    bar.style.display = 'block';
+    setTimeout(()=>{ bar.style.display = 'none'; }, 4500);
+}
+
+function renderDashboard(){
+    const grid = document.getElementById('dashboardGrid');
+    if(!grid) return;
+    const totalEmployees = employes.length;
+    const totalPaid = employes.reduce((sum,e)=>sum + (parseInt(e.totalRetire)||0),0);
+    const totalRemaining = employes.reduce((sum,e)=>sum + (parseInt(e.reste)||0),0);
+    const lowBalanceCount = employes.filter(e=>parseInt(e.reste) < 50000).length;
+
+    grid.innerHTML = `
+        <div class="dashboard-card"><h4>Total employés</h4><p>${totalEmployees}</p></div>
+        <div class="dashboard-card"><h4>Total payé</h4><p>${totalPaid.toLocaleString('fr-FR')} FCFA</p></div>
+        <div class="dashboard-card"><h4>Total restant</h4><p>${totalRemaining.toLocaleString('fr-FR')} FCFA</p></div>
+        <div class="dashboard-card"><h4>Soldes faibles</h4><p>${lowBalanceCount} employé(s)</p></div>
+    `;
+}
+
+function showLowBalance(threshold){
+    const employees = employes.filter(e => parseInt(e.reste) < threshold);
+    if(employees.length === 0){
+        showNotification(`Aucun employé avec un reste inférieur à ${threshold.toLocaleString('fr-FR')} FCFA.`, 'success');
+        return;
+    }
+    const names = employees.map(e => `${e.nom} ${e.prenom}`).join(', ');
+    showNotification(`Solde bas (< ${threshold.toLocaleString('fr-FR')}) : ${names}`, 'warning');
+}
+
+function loadTheme(){
+    const theme = localStorage.getItem(THEME_KEY) || 'light';
+    document.body.classList.toggle('dark-mode', theme === 'dark');
+    const btn = document.getElementById('themeToggleBtn');
+    if(btn) btn.textContent = theme === 'dark' ? 'Mode clair' : 'Mode sombre';
+}
+
+function toggleTheme(){
+    const isDark = document.body.classList.toggle('dark-mode');
+    localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
+    const btn = document.getElementById('themeToggleBtn');
+    if(btn) btn.textContent = isDark ? 'Mode clair' : 'Mode sombre';
+}
+
+function openAdminModal(){
+    document.getElementById('adminModal').style.display = 'block';
+    document.getElementById('adminPasswordInput').value = '';
+    document.getElementById('adminError').style.display = 'none';
+}
+
+function closeAdminModal(){
+    document.getElementById('adminModal').style.display = 'none';
+}
+
+function verifyAdminPassword(){
+    try{
+        const val = document.getElementById('adminPasswordInput').value || '';
+        console.log('verifyAdminPassword invoked, entered:', val);
+        if(val === ADMIN_PASSWORD){
+            // Ensure owner user exists and set current user as owner admin
+            if(!users.find(u=>u.email.toLowerCase()===OWNER_EMAIL.toLowerCase())){
+                users.push({email: OWNER_EMAIL, role: 'admin'});
+                localStorage.setItem('users', JSON.stringify(users));
+            } else {
+                // make sure owner's role is admin
+                const own = users.find(u=>u.email.toLowerCase()===OWNER_EMAIL.toLowerCase());
+                if(own.role !== 'admin') { own.role = 'admin'; localStorage.setItem('users', JSON.stringify(users)); }
+            }
+            setAdminState(true);
+            setCurrentUser(OWNER_EMAIL,'admin');
+            closeAdminModal();
+            // redirect to dedicated admin page for better controls
+            window.location.href = 'admin.html';
+        } else {
+            document.getElementById('adminError').textContent = 'Accès refusé';
+            document.getElementById('adminError').style.display = 'block';
+        }
+    }catch(err){
+        console.error('Error in verifyAdminPassword:', err);
+        alert('Erreur JavaScript: '+(err && err.message));
+    }
+}
+
+function logoutAdmin(){
+    setAdminState(false);
+    setCurrentUser('','viewer');
+    logGlobal('Déconnexion administrateur');
+}
+
+// Login by email (users list)
+function openLoginModal(){
+    document.getElementById('loginModal').style.display = 'block';
+    document.getElementById('loginEmailInput').value = '';
+    document.getElementById('loginError').style.display = 'none';
+}
+
+function closeLoginModal(){
+    document.getElementById('loginModal').style.display = 'none';
+}
+
+function loginByEmail(){
+    const email = (document.getElementById('loginEmailInput').value || '').trim().toLowerCase();
+    if(!email){ document.getElementById('loginError').textContent='Email requis'; document.getElementById('loginError').style.display='block'; return; }
+    // Si l'email correspond au propriétaire, on le crée/attribue admin automatiquement
+    if(email === OWNER_EMAIL){
+        let owner = users.find(x=>x.email.toLowerCase()===email);
+        if(!owner){
+            users.push({email: email, role: 'admin'});
+            localStorage.setItem('users', JSON.stringify(users));
+        } else if(owner.role !== 'admin'){
+            // garantir le rôle admin du propriétaire
+            owner.role = 'admin';
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+        setCurrentUser(email, 'admin');
+        closeLoginModal();
+        // redirect owner to admin dashboard
+        window.location.href = 'admin.html';
+        logGlobal('Connexion propriétaire: '+email+' (admin) - redirection vers admin.html');
+        return;
+    }
+
+    const u = users.find(x=>x.email.toLowerCase()===email);
+    if(!u){ document.getElementById('loginError').textContent='Utilisateur non trouvé'; document.getElementById('loginError').style.display='block'; return; }
+    setCurrentUser(u.email, u.role);
+    closeLoginModal();
+    logGlobal('Connexion utilisateur: '+u.email+' ('+u.role+')');
+}
+
+function logoutUser(){
+    setCurrentUser('','viewer');
+    closeDrawer();
+    closeLoginModal();
+    logGlobal('Déconnexion utilisateur');
+}
+
+function printFacture(){
+    if(!requireLogin()) return;
+    if(!hasPrivilege('print_invoice')){ alert('Accès refusé'); return; }
+    window.print();
+}
+
+// Confirmation modal handling
+let pendingConfirm = null; // {title,message,callback}
+function openConfirmModal(title, message, callback){
+    pendingConfirm = callback;
+    const titleEl = document.getElementById('confirmTitle');
+    const msgEl = document.getElementById('confirmMessage');
+    const pwdEl = document.getElementById('confirmPassword');
+    const errEl = document.getElementById('confirmError');
+    const modalEl = document.getElementById('confirmModal');
+    if(titleEl) titleEl.textContent = title;
+    if(msgEl) msgEl.textContent = message;
+    if(pwdEl) pwdEl.value = '';
+    if(errEl) errEl.style.display = 'none';
+    if(modalEl){
+        modalEl.style.display = 'block';
+        return;
+    }
+    // Fallback: simple prompt if confirm modal missing
+    const attempt = prompt(title + '\n' + message + '\nEntrez le mot de passe administrateur:');
+    if(attempt === ADMIN_PASSWORD){
+        if(typeof pendingConfirm === 'function') pendingConfirm();
+        pendingConfirm = null;
+    } else {
+        alert('Accès refusé');
+    }
+}
+
+function closeConfirmModal(){
+    pendingConfirm = null;
+    const modalEl = document.getElementById('confirmModal');
+    if(modalEl) modalEl.style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+    const ok = document.getElementById('confirmOkBtn');
+    if(ok) ok.addEventListener('click', ()=>{
+        const pwdEl = document.getElementById('confirmPassword');
+        const pwd = pwdEl ? (pwdEl.value || '') : prompt('Entrez le mot de passe administrateur pour confirmer:') || '';
+        if(pwd !== ADMIN_PASSWORD){
+            const errEl = document.getElementById('confirmError');
+            if(errEl){ errEl.textContent = 'Accès refusé'; errEl.style.display = 'block'; }
+            else alert('Accès refusé');
+            return;
+        }
+        // execute pending action
+        if(typeof pendingConfirm === 'function'){
+            try{ pendingConfirm(); }
+            catch(e){ console.error(e); }
+        }
+        closeConfirmModal();
+        logGlobal('Action sensible confirmée par admin');
+    });
+});
+
+// Export data as JSON
+function exportData(){
+    if(!hasPrivilege('export')){ alert('Accès refusé'); return; }
+    const payload = {
+        employes: employes,
+        globalHistory: globalHistory,
+        users: users,
+        date: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'backup_gestion_' + Date.now() + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+}
+
+// Restore from uploaded file
+function restoreFromFile(e){
+    if(!hasPrivilege('restore')){ alert('Accès refusé'); return; }
+    const f = e.target.files[0];
+    if(!f) return;
+    const reader = new FileReader();
+    reader.onload = function(ev){
+        try{
+            const data = JSON.parse(ev.target.result);
+            if(Array.isArray(data.employes) && Array.isArray(data.globalHistory)){
+                employes = data.employes;
+                globalHistory = data.globalHistory;
+                if(Array.isArray(data.users)) users = data.users;
+                save();
+                renderTable(employes);
+                renderCards();
+                renderGlobalHistory();
+                renderUsersList();
+                alert('Restauration effectuée');
+                logGlobal('Restauration de sauvegarde (import)');
+            } else {
+                alert('Fichier invalide');
+            }
+        }catch(err){
+            alert('Erreur lors de la lecture du fichier');
+        }
+    };
+    reader.readAsText(f);
+    // clear input
+    e.target.value = '';
+}
+
+// Reset all data (admin only)
+function resetAllData(){
+    if(!hasPrivilege('reset')){ alert('Accès refusé'); return; }
+    openConfirmModal('Réinitialisation complète', 'Vous allez réinitialiser toutes les données (employés, historique, utilisateurs). Confirmez avec le mot de passe administrateur.', function(){
+        employes = [];
+        globalHistory = [];
+        users = [];
+        save();
+        renderTable(employes);
+        renderCards();
+        renderGlobalHistory();
+        renderUsersList();
+        alert('Données réinitialisées');
+        logGlobal('Réinitialisation totale des données (admin)');
+    });
+}
+
+// Delete employee (admin only)
+function supprimerEmploye(id){
+    if(!hasPrivilege('delete')){ alert('Accès refusé'); return; }
+    const emp = employes.find(e=>e.id==id);
+    if(!emp) return;
+    openConfirmModal('Suppression employé', `Supprimer définitivement ${emp.nom} ${emp.prenom} ? Confirmez avec le mot de passe administrateur.`, function(){
+        employes = employes.filter(e=>e.id != id);
+        save();
+        renderTable(employes);
+        renderCards();
+        logGlobal('Suppression employé id='+id+' ('+emp.nom+' '+emp.prenom+')');
+    });
+}
+
+
+let employes = JSON.parse(localStorage.getItem("employes")) || [];
+let globalHistory = JSON.parse(localStorage.getItem("globalHistory")) || [];
+
+function save(){
+    localStorage.setItem("employes", JSON.stringify(employes));
+    localStorage.setItem("globalHistory", JSON.stringify(globalHistory));
+    localStorage.setItem("users", JSON.stringify(users));
+}
+
+function logGlobal(desc){
+    try{
+        if(!Array.isArray(globalHistory)) globalHistory = [];
+        globalHistory.unshift({
+            date: new Date().toLocaleString(),
+            description: desc,
+            user: getCurrentEmail() || 'invité'
+        });
+        save();
+    }catch(e){
+        console.error('logGlobal failed:', e);
+    }
+}
+
+/* GESTION DU MENU BURGER ET VUES */
+function openDrawer(){
+    if(!requireLogin()) return;
+    const sd = document.getElementById("sideDrawer");
+    const w = window.innerWidth;
+    if(w <= 480){
+        sd.style.width = "100%"; // very small phones: full screen
+    } else if(w <= 768){
+        sd.style.width = "80vw"; // small screens: most of screen but not full
+        sd.style.maxWidth = "360px";
+    } else {
+        sd.style.width = "250px";
+    }
+}
+function closeDrawer(){
+    document.getElementById("sideDrawer").style.width = "0";
+}
+function switchView(viewName){
+    if(!requireLogin()) return;
+    closeDrawer();
+    document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+    if(viewName === 'dashboard') {
+        document.getElementById('view-dashboard').classList.add('active');
+        renderDashboard();
+    }
+    else if(viewName === 'table') {
+        document.getElementById('view-table').classList.add('active');
+    }
+    else if(viewName === 'cards') {
+        document.getElementById('view-cards').classList.add('active');
+        renderCards();
+    }
+    else if(viewName === 'globalHistory') {
+        document.getElementById('view-globalHistory').classList.add('active');
+        renderGlobalHistory();
+    }
+    else if(viewName === 'addEmployee') {
+        if(hasPrivilege('add')){
+            document.getElementById('view-addEmployee').classList.add('active');
+        } else {
+            alert('Accès refusé. Contactez l\'administrateur.');
+        }
+    }
+    else if(viewName === 'facture') {
+        document.getElementById('view-facture').classList.add('active');
+    }
+    else if(viewName === 'admin' && isAdmin()) {
+        document.getElementById('view-admin').classList.add('active');
+    }
+}
+
+/* ===================== */
+/* AFFICHAGE PRINCIPAL */
+/* ===================== */
+function renderTable(list){
+let tbody=document.getElementById("employeTable");
+tbody.innerHTML="";
+
+list.forEach(emp=>{
+
+let tr=document.createElement("tr");
+    // Build action buttons depending on admin status
+    let actions = '';
+    if(hasPrivilege('retrait')) actions += `<button onclick="retrait(${emp.id})">Retrait</button>`;
+    if(hasPrivilege('depot')) actions += `<button onclick="depot(${emp.id})">Dépôt</button>`;
+    actions += `<button onclick="afficherHistorique(${emp.id})">Historique</button>`;
+    if(hasPrivilege('modify')){
+        actions += `<button onclick="modifierEmploye(${emp.id})" style="background:#d97706;">Modifier</button>`;
+    }
+    if(hasPrivilege('delete')){
+        actions += `<button onclick="supprimerEmploye(${emp.id})" style="background:#b91c1c;margin-left:6px;">Supprimer</button>`;
+    }
+
+    // Make fields editable when user has modify privilege
+    const editable = hasPrivilege('modify') ? 'true' : 'false';
+    tr.innerHTML = `
+        <td>
+            ${emp.photo ? `<img src="${emp.photo}" class="photo-mini">` : ""}
+            <span class="editable" data-id="${emp.id}" data-field="nom" contenteditable="${editable}">${emp.nom}</span>
+        </td>
+        <td><span class="editable" data-id="${emp.id}" data-field="prenom" contenteditable="${editable}">${emp.prenom}</span></td>
+        <td><span>${emp.salaireBase || 75000}</span> FCFA</td>
+        <td><span class="editable" data-id="${emp.id}" data-field="totalRetire" contenteditable="${editable}">${emp.totalRetire}</span> FCFA</td>
+        <td><span class="editable" data-id="${emp.id}" data-field="reste" contenteditable="${editable}">${emp.reste}</span> FCFA</td>
+        <td>${actions}</td>
+    `;
+
+    tbody.appendChild(tr);
+    // attach listeners to editable fields
+    tr.querySelectorAll('.editable').forEach(el=>{
+        el.addEventListener('blur', function(e){
+            const id = this.dataset.id;
+            const field = this.dataset.field;
+            const newVal = this.textContent.trim();
+            saveEditedField(id, field, newVal);
+        });
+    });
+});
+}
+
+function renderCards(){
+let grid = document.getElementById("cardsGrid");
+grid.innerHTML = "";
+employes.forEach(emp => {
+let card = document.createElement("div");
+card.className = "employee-card";
+    let actions = '';
+    if(hasPrivilege('retrait')) actions += `<button onclick="retrait(${emp.id})">Retrait</button>`;
+    if(hasPrivilege('depot')) actions += `<button onclick="depot(${emp.id})">Dépôt</button>`;
+    actions += `<button onclick="afficherHistorique(${emp.id})">Historique</button>`;
+    if(hasPrivilege('modify')){
+        actions += `<button onclick="modifierEmploye(${emp.id})" style="background:#d97706; margin-top:5px;">Modifier</button>`;
+    }
+    if(hasPrivilege('delete')){
+        actions += `<button onclick="supprimerEmploye(${emp.id})" style="background:#b91c1c; margin-top:5px; margin-left:6px;">Supprimer</button>`;
+    }
+    const editable = hasPrivilege('modify') ? 'true' : 'false';
+    card.innerHTML = `
+        ${emp.photo ? `<img src="${emp.photo}">` : `<img src="https://via.placeholder.com/70">`}
+        <h4><span class="editable" data-id="${emp.id}" data-field="nom" contenteditable="${editable}">${emp.nom}</span> <span class="editable" data-id="${emp.id}" data-field="prenom" contenteditable="${editable}">${emp.prenom}</span></h4>
+        <p>Salaire: <span>${emp.salaireBase || 75000}</span> FCFA</p>
+        <p>Total Reçu: <span class="editable" data-id="${emp.id}" data-field="totalRetire" contenteditable="${editable}">${emp.totalRetire}</span> FCFA</p>
+        <p>Reste: <b><span class="editable" data-id="${emp.id}" data-field="reste" contenteditable="${editable}">${emp.reste}</span> FCFA</b></p>
+        ${actions}
+    `;
+grid.appendChild(card);
+    card.querySelectorAll('.editable').forEach(el=>{
+        el.addEventListener('blur', function(e){
+            const id = this.dataset.id;
+            const field = this.dataset.field;
+            const newVal = this.textContent.trim();
+            saveEditedField(id, field, newVal);
+        });
+    });
+});
+}
+
+function renderGlobalHistory(){
+let div = document.getElementById("globalHistoryContent");
+div.innerHTML = "";
+if(globalHistory.length === 0){
+ div.innerHTML = "<p>Aucune transaction enregistrée.</p>";
+} else {
+ globalHistory.forEach(item => {
+ const userTag = item.user ? ` <span style="color:#1e3a8a;font-weight:bold;">[${item.user}]</span>` : '';
+ div.innerHTML += `<p><strong>${item.date}</strong>${userTag} - ${item.description}</p>`;
+ });
+}
+}
+
+/* 🔥 FIX IMPORTANT */
+function afficher(){
+renderTable(employes);
+}
+
+/* ===================== */
+/* AJOUT EMPLOYÉ */
+/* ===================== */
+function ajouterEmploye(){
+    if(!hasPrivilege('add')){
+        alert('Accès refusé. Contactez l\'administrateur.');
+        return;
+    }
+
+    let nom=document.getElementById("nom").value.trim();
+let prenom=document.getElementById("prenom").value.trim();
+let salaire=parseInt(document.getElementById("salaire").value);
+let photoInput=document.getElementById("photo");
+
+if(!nom || !prenom || !salaire){
+alert("Remplir tous les champs");
+return;
+}
+
+let reader=new FileReader();
+
+reader.onload=function(e){
+
+employes.push({
+id:Date.now(),
+nom,
+prenom,
+photo:e.target.result || "",
+salaireBase:salaire,
+totalRetire:0,
+reste:salaire,
+transactions:[]
+});
+
+save();
+logGlobal(`Ajout de l'employé : ${nom} ${prenom} (Salaire: ${salaire} FCFA)`);
+renderTable(employes);
+switchView('table');
+
+document.getElementById("nom").value="";
+document.getElementById("prenom").value="";
+document.getElementById("salaire").value="";
+document.getElementById("photo").value="";
+};
+
+if(photoInput.files[0]){
+reader.readAsDataURL(photoInput.files[0]);
+}else{
+reader.onload({target:{result:""}});
+}
+}
+
+/* ===================== */
+/* MODIFIER EMPLOYÉ */
+/* ===================== */
+function modifierEmploye(id){
+    if(!requireLogin() || !hasPrivilege('modify')){ alert('Accès refusé'); return; }
+
+    let emp = employes.find(e => e.id == id);
+    if(!emp) return;
+
+    let nouveauNom = prompt("Modifier le nom :", emp.nom);
+if(nouveauNom === null) return;
+let nouveauPrenom = prompt("Modifier le prénom :", emp.prenom);
+if(nouveauPrenom === null) return;
+let nouveauTotal = parseInt(prompt("Modifier le Salaire Total Reçu :", emp.totalRetire));
+if(isNaN(nouveauTotal)) return;
+let nouveauReste = parseInt(prompt("Modifier le Reste :", emp.reste));
+if(isNaN(nouveauReste)) return;
+
+emp.nom = nouveauNom.trim() || emp.nom;
+emp.prenom = nouveauPrenom.trim() || emp.prenom;
+emp.totalRetire = nouveauTotal;
+emp.reste = nouveauReste;
+
+save();
+logGlobal(`Modification de l'employé : ${emp.nom} ${emp.prenom}`);
+renderTable(employes);
+renderCards();
+}
+
+/* ===================== */
+/* RECHERCHE FIXÉE */
+/* ===================== */
+function searchEmploye(){
+let q = document.getElementById("searchInput").value.trim().toLowerCase();
+
+if(q === ""){
+renderTable(employes);
+return;
+}
+
+let filtered = employes.filter(e =>
+(e.nom && e.nom.toLowerCase().includes(q)) ||
+(e.prenom && e.prenom.toLowerCase().includes(q))
+);
+
+renderTable(filtered);
+}
+
+/* ===================== */
+/* RETRAIT */
+/* ===================== */
+function retrait(id){
+    if(!requireLogin() || !hasPrivilege('retrait')){ alert('Accès refusé'); return; }
+
+    let montant=parseInt(prompt("Montant à retirer :"));
+    if(isNaN(montant) || montant<=0) return;
+
+    let emp=employes.find(e=>e.id==id);
+    if(!emp) return;
+
+    if(montant>emp.reste){
+        alert("Solde insuffisant");
+        return;
+    }
+
+    emp.reste -= montant;
+
+    let transDesc = `Retrait de ${montant} FCFA effectué pour ${emp.nom} ${emp.prenom}`;
+    emp.transactions.push({
+        type:"Retrait",
+        montant,
+        date:new Date().toLocaleString()
+    });
+
+    save();
+    logGlobal(transDesc);
+    renderTable(employes);
+    renderCards();
+}
+
+/* ===================== */
+/* DEPOT */
+/* ===================== */
+function depot(id){
+    if(!requireLogin() || !hasPrivilege('depot')){ alert('Accès refusé'); return; }
+
+const montant = 75000;
+
+let emp=employes.find(e=>e.id==id);
+if(!emp) return;
+
+emp.totalRetire += montant;
+emp.reste += montant;
+
+let transDesc = `Dépôt de ${montant} FCFA effectué pour ${emp.nom} ${emp.prenom}`;
+emp.transactions.push({
+type:"Dépôt",
+montant,
+date:new Date().toLocaleString()
+});
+
+save();
+logGlobal(transDesc);
+renderTable(employes);
+renderCards();
+}
+
+/* ===================== */
+/* HISTORIQUE */
+/* ===================== */
+function afficherHistorique(id){
+    if(!requireLogin()) return;
+
+let emp=employes.find(e=>id==e.id);
+let div=document.getElementById("historyContent");
+div.innerHTML="";
+
+if(emp.transactions.length===0){
+div.innerHTML="Aucune transaction";
+}else{
+emp.transactions.forEach((t,index)=>{
+div.innerHTML+=`
+<p>
+${t.date} - ${t.type} : ${t.montant} FCFA
+</p>
+`;
+});
+}
+
+document.getElementById("historyModal").style.display="block";
+}
+
+function fermerHistorique(){
+document.getElementById("historyModal").style.display="none";
+}
+
+/* INIT */
+renderTable(employes);
+renderDashboard();
+loadTheme();
+
+// Initialize admin UI state and listeners
+const adminBtn = document.getElementById('adminButton');
+if(adminBtn) adminBtn.addEventListener('click', openAdminModal);
+const themeBtn = document.getElementById('themeToggleBtn');
+if(themeBtn) themeBtn.addEventListener('click', toggleTheme);
+const adminLogoutBtn = document.getElementById('adminLogout');
+if(adminLogoutBtn) adminLogoutBtn.addEventListener('click', logoutAdmin);
+// small logout button in admin view
+const btnLogoutSmall = document.getElementById('btnLogoutSmall');
+if(btnLogoutSmall) btnLogoutSmall.addEventListener('click', logoutAdmin);
+
+const loginBtnEl = document.getElementById('loginButton');
+if(loginBtnEl) loginBtnEl.addEventListener('click', openLoginModal);
+const userLogoutEl = document.getElementById('userLogout');
+if(userLogoutEl) userLogoutEl.addEventListener('click', logoutUser);
+
+updateAdminUI();
+
+// User management functions
+function addUserFromAdmin(){
+    if(!isAdmin()){ alert('Accès refusé'); return; }
+    const email = (document.getElementById('newUserEmail').value||'').trim().toLowerCase();
+    const role = document.getElementById('newUserRole').value;
+    if(!email) { alert('Email requis'); return; }
+    addUser(email, role);
+    document.getElementById('newUserEmail').value = '';
+}
+
+function addUser(email, role){
+    if(users.find(u=>u.email.toLowerCase()===email.toLowerCase())){ alert('Utilisateur déjà existant'); return; }
+    if(email === OWNER_EMAIL) role = 'admin';
+    users.push({email, role});
+    localStorage.setItem('users', JSON.stringify(users));
+    renderUsersList();
+    logGlobal('Ajout utilisateur: '+email+' ('+role+')');
+}
+
+function removeUser(email){
+    if(!isAdmin()){ alert('Accès refusé'); return; }
+    if(email.toLowerCase() === OWNER_EMAIL.toLowerCase()){ alert('Impossible de supprimer le propriétaire.'); return; }
+    if(!confirm('Supprimer cet utilisateur ?')) return;
+    users = users.filter(u=>u.email.toLowerCase()!==email.toLowerCase());
+    localStorage.setItem('users', JSON.stringify(users));
+    renderUsersList();
+    logGlobal('Suppression utilisateur: '+email);
+}
+
+function renderUsersList(){
+    const tbody = document.getElementById('usersTbody');
+    if(!tbody) return;
+    tbody.innerHTML = '';
+    users.forEach(u=>{
+        const isOwner = u.email.toLowerCase() === OWNER_EMAIL.toLowerCase();
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${u.email}</td><td>${u.role}</td><td>${isAdmin() ? `${isOwner ? 'Propriétaire' : `<button onclick="removeUser('${u.email}')">Supprimer</button>`}` : ''}</td>`;
+        tbody.appendChild(tr);
+    });
+}
+
+// Save edited field from contenteditable
+function saveEditedField(id, field, newVal){
+    if(!requireLogin() || !hasPrivilege('modify')) return;
+    if(field === 'salaireBase') return; // Salary is fixed and cannot be edited directly
+    const emp = employes.find(e=>String(e.id) === String(id));
+    if(!emp) return;
+    const old = emp[field];
+    let parsed = newVal;
+    if(field === 'totalRetire' || field === 'reste'){
+        // remove non-digits
+        parsed = parseInt(newVal.replace(/[^0-9]/g,'')) || 0;
+    }
+    emp[field] = parsed;
+    save();
+    renderTable(employes);
+    renderCards();
+    logGlobal(`Modification champ ${field} pour ${emp.nom} ${emp.prenom} : ${old} -> ${parsed}`);
+}
+
+</script>
+</body>
+</html>
