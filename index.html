@@ -52,6 +52,9 @@ button:hover{background:#162d66;}
     .facture-scope .company-name{font-size:28px;}
     .facture-scope .header svg{width:80px;height:80px;}
     .facture-scope .client-box{font-size:18px;padding:6px 10px;min-width:160px;}
+    /* hide fixed adminBar on small screens, use drawer controls */
+    #adminBar{display:none !important;}
+    #drawerAdminControls{display:block;}
 }
 
 /* Menu burger */
@@ -60,6 +63,11 @@ button:hover{background:#162d66;}
 .side-drawer a{padding:12px 24px;text-decoration:none;font-size:18px;color:white;display:block;transition:0.2s;}
 .side-drawer a:hover{background:#162d66;}
 .side-drawer .close-drawer{position:absolute;top:15px;right:20px;font-size:24px;cursor:pointer;color:white;}
+
+/* Drawer admin controls (visible on mobile) */
+.side-drawer .drawer-admin{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.side-drawer .drawer-admin .badge{display:inline-block;padding:6px 8px;background:#0ea5a4;color:#fff;border-radius:6px;font-weight:bold;margin-bottom:8px;}
+.side-drawer .drawer-admin button{display:inline-block;background:rgba(255,255,255,0.08);color:white;border:none;padding:6px 8px;border-radius:6px;margin-right:6px;margin-top:6px;cursor:pointer}
 
 /* Vues */
 .view-section{display:none;}
@@ -378,6 +386,16 @@ th{background:#1e3a8a;color:white;}
 
 <div id="sideDrawer" class="side-drawer">
 <span class="close-drawer" onclick="closeDrawer()">&times;</span>
+    <div id="drawerAdminControls" class="drawer-admin" style="display:none;">
+        <div id="drawerUserBadges"></div>
+        <div style="margin-top:6px;">
+            <button id="drawerAdminButton" onclick="openAdminModal()">Connexion Admin</button>
+            <button id="drawerLoginButton" onclick="openLoginModal()">Se connecter</button>
+            <button id="drawerThemeBtn" onclick="toggleTheme()">Mode sombre</button>
+            <button id="drawerAdminLogout" onclick="logoutAdmin()" style="display:none;">Déconnexion Admin</button>
+            <button id="drawerUserLogout" onclick="logoutUser()" style="display:none;">Déconnexion</button>
+        </div>
+    </div>
 <a href="#" onclick="switchView('dashboard')">🏠 Tableau de bord</a>
 <a href="#" onclick="switchView('table')">📊 Tableau Employés</a>
 <a href="#" onclick="switchView('cards')">👥 Cartes Employé</a>
@@ -763,6 +781,24 @@ function updateAdminUI(){
     const adminUserManagementEl = document.getElementById('adminUserManagement');
     if(adminUserManagementEl) adminUserManagementEl.style.display = isAdmin() ? 'block' : 'none';
     renderUsersList();
+    // Sync drawer admin controls (mobile)
+    const drawer = document.getElementById('drawerAdminControls');
+    if(drawer){
+        const dUserBadges = document.getElementById('drawerUserBadges');
+        const dAdminBtn = document.getElementById('drawerAdminButton');
+        const dLoginBtn = document.getElementById('drawerLoginButton');
+        const dThemeBtn = document.getElementById('drawerThemeBtn');
+        const dAdminLogout = document.getElementById('drawerAdminLogout');
+        const dUserLogout = document.getElementById('drawerUserLogout');
+        // Show drawer controls only on narrow screens
+        drawer.style.display = window.innerWidth <= 600 ? 'block' : 'none';
+        if(dUserBadges) dUserBadges.innerHTML = email ? `<span class="badge">${email}</span>` : '';
+        if(dAdminBtn) dAdminBtn.style.display = (!loggedIn || isAdmin()) ? 'inline-block' : 'none';
+        if(dLoginBtn) dLoginBtn.style.display = loggedIn ? 'none' : 'inline-block';
+        if(dAdminLogout) dAdminLogout.style.display = isAdmin() ? 'inline-block' : 'none';
+        if(dUserLogout) dUserLogout.style.display = loggedIn ? 'inline-block' : 'none';
+        if(dThemeBtn) dThemeBtn.textContent = (localStorage.getItem(THEME_KEY) === 'dark') ? 'Mode clair' : 'Mode sombre';
+    }
     // If currently showing admin view but not admin, switch back to table
     if(!isAdmin() && document.getElementById('view-admin').classList.contains('active')){
         switchView('table');
