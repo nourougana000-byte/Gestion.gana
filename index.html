@@ -32,16 +32,23 @@ button:hover{background:#162d66;}
 
 /* Mobile / touch improvements */
 @media (max-width: 600px) {
-    button{padding:12px 14px;font-size:16px;border-radius:8px;}
-    input{padding:10px;font-size:15px;}
-    .container{padding:12px;margin:10px;}
-    .burger-menu{top:12px;left:12px;font-size:28px;}
-    .photo-mini{width:40px;height:40px;}
-    .employee-card img{width:90px;height:90px;}
+    body{font-size:14px;}
+    header{padding:12px;}
+    header h2{font-size:18px;margin:0;}
+    header p{font-size:12px;margin:4px 0 0 0;}
+    button{padding:8px 10px;font-size:14px;border-radius:6px;}
+    input{padding:8px;font-size:14px;}
+    .container{padding:10px;margin:8px;}
+    .burger-menu{top:10px;left:10px;font-size:26px;display:block;z-index:2000;}
+    .photo-mini{width:34px;height:34px;}
+    .employee-card img{width:70px;height:70px;}
     table thead {display:none;} /* simplify table view on very small devices */
     table, tbody, tr, td {display:block;width:100%;}
     tr{margin-bottom:12px;border-bottom:1px solid #e5e7eb;padding-bottom:12px;}
     td{text-align:left;padding:6px 8px;border:none;}
+    .side-drawer a{font-size:18px;padding:12px 18px;}
+    /* Make the printed-style invoice responsive on phones */
+    .facture-scope .document-a4{width:100%;min-height:unset;padding:10mm;box-shadow:none;}
 }
 
 /* Menu burger */
