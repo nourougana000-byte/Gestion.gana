@@ -48,17 +48,14 @@ button:hover{background:#162d66;}
     .burger-menu{top:8px;left:8px;font-size:22px;display:block;z-index:2000;width:38px;height:38px;border-radius:6px;background:rgba(0,0,0,0.08);}
     .photo-mini{width:30px;height:30px;}
     .employee-card img{width:60px;height:60px;}
-    table thead {display:none;} /* simplify table view on very small devices */
-    table, tbody, tr, td {display:block;width:100%;}
-    tr{margin-bottom:12px;border-bottom:1px solid #e5e7eb;padding-bottom:12px;}
-    td{text-align:left;padding:6px 8px;border:none;}
+    .table-responsive{overflow-x:auto;}
     .side-drawer a{font-size:16px;padding:10px 14px;}
     /* Make the printed-style invoice responsive on phones */
     .facture-scope .document-a4{width:100%;min-height:unset;padding:8mm;box-shadow:none;}
     .facture-scope .company-name{font-size:28px;}
     .facture-scope .header svg{width:80px;height:80px;}
     .facture-scope .client-box{font-size:18px;padding:6px 10px;min-width:160px;}
-    /* hide fixed adminBar on small screens, use drawer controls */
+    /* Hide fixed adminBar on small screens, use drawer controls */
     #adminBar{display:none !important;}
     #drawerAdminControls{display:block;}
 }
@@ -261,11 +258,17 @@ th{background:#1e3a8a;color:white;}
     border-collapse: collapse;
     margin-bottom: 15px;
     font-size: 14px;
+    table-layout: fixed;
 }
 .facture-scope .data-table th, .facture-scope .data-table td {
     border: 1px solid black;
     padding: 6px;
 }
+.facture-scope .data-table th:nth-child(1), .facture-scope .data-table td:nth-child(1) { width: 50%; }
+.facture-scope .data-table th:nth-child(2), .facture-scope .data-table td:nth-child(2),
+.facture-scope .data-table th:nth-child(3), .facture-scope .data-table td:nth-child(3) { width: 10%; }
+.facture-scope .data-table th:nth-child(4), .facture-scope .data-table td:nth-child(4),
+.facture-scope .data-table th:nth-child(5), .facture-scope .data-table td:nth-child(5) { width: 15%; }
 .facture-scope .data-table th {
     font-family: "Times New Roman", Times, serif;
     font-weight: bold;
@@ -350,16 +353,17 @@ th{background:#1e3a8a;color:white;}
     .facture-scope .client-box {display:block;width:100%;border-width:2px;font-size:16px;padding:8px 10px;min-width:0;}
     .facture-scope .document-title {font-size:18px;}
     .facture-scope .document-subject {font-size:13px;line-height:1.5;margin-bottom:14px;text-align:left;}
-    .facture-scope .data-table {font-size:13px;width:100%;}
-    .facture-scope .data-table thead {display:none;}
-    .facture-scope .data-table tr {display:block;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:12px;overflow:hidden;background:#fafafa;}
-    .facture-scope .data-table td {display:flex;justify-content:space-between;align-items:flex-start;padding:10px 12px;border-bottom:1px solid #e5e7eb;position:relative;}
+    .facture-scope .data-table {font-size:13px;width:100%;table-layout:fixed;border-collapse:collapse;}
+    .facture-scope .data-table th, .facture-scope .data-table td {white-space:normal;word-break:break-word;}
+    .facture-scope .data-table th:nth-child(1), .facture-scope .data-table td:nth-child(1) {width:50%;}
+    .facture-scope .data-table th:nth-child(2), .facture-scope .data-table td:nth-child(2),
+    .facture-scope .data-table th:nth-child(3), .facture-scope .data-table td:nth-child(3) {width:10%;}
+    .facture-scope .data-table th:nth-child(4), .facture-scope .data-table td:nth-child(4),
+    .facture-scope .data-table th:nth-child(5), .facture-scope .data-table td:nth-child(5) {width:15%;}
+    .facture-scope .data-table tr {background:#fafafa;}
+    .facture-scope .data-table td {padding:10px 12px;border-bottom:1px solid #e5e7eb;}
     .facture-scope .data-table td:last-child {border-bottom:none;}
-    .facture-scope .data-table td::before {content:attr(data-label);width:40%;flex:0 0 40%;font-weight:700;color:#166e36;white-space:normal;word-break:break-word;}
-    .facture-scope .data-table td span{display:block;width:58%;text-align:right;word-break:break-word;}
-    .facture-scope .data-table td:last-child span {text-align:right;}
-    .facture-scope .data-table td[colspan] {display:flex;flex-direction:column;border-bottom:1px solid #e5e7eb;}
-    .facture-scope .data-table td[colspan]::before {content:'';}
+    .facture-scope .data-table td[colspan] {display:table-cell;border-bottom:1px solid #e5e7eb;}
     .facture-scope .amount-words {font-size:13px;margin-top:12px;padding-left:0;}
     .facture-scope .stamp-section {margin-right:0;text-align:left;}
     .facture-scope .stamp-image {width:160px;}
