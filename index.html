@@ -24,8 +24,14 @@ body.dark-mode table{background:#111827;}
 body.dark-mode input{background:#1f2937;color:#e2e8f0;border:1px solid #334155;}
 body.dark-mode button{background:#2563eb;color:white;}
 body.dark-mode button:hover{background:#1d4ed8;}
+*,*::before,*::after{box-sizing:border-box;}
+html,body{width:100%;max-width:100%;overflow-x:hidden;}
+img{max-width:100%;height:auto;display:block;}
 header{background:#1e3a8a;color:white;text-align:center;padding:20px;position:relative;}
-.container{width:95%;max-width:1100px;margin:20px auto;background:white;padding:20px;border-radius:10px;}
+.container{width:95%;max-width:1100px;margin:20px auto;background:white;padding:20px;border-radius:10px;min-width:0;}
+.view-section{min-width:0;}
+.dashboard-grid,.cards-grid,.table-responsive{min-width:0;}
+input,button,select,textarea{max-width:100%;}
 input{padding:8px;margin:5px;}
 button{padding:6px 10px;background:#1e3a8a;color:white;border:none;cursor:pointer;border-radius:4px;}
 button:hover{background:#162d66;}
@@ -75,8 +81,20 @@ button:hover{background:#162d66;}
     .employee-card{padding:12px}
     .employee-card img{width:60px;height:60px}
     /* Make tables horizontally scrollable on small screens */
-    .table-responsive{overflow-x:auto;-webkit-overflow-scrolling:touch;-ms-overflow-style:-ms-autohiding-scrollbar;}
-    .table-responsive table{width:100%;min-width:520px;border-collapse:collapse}
+    .table-responsive{overflow-x:auto;-webkit-overflow-scrolling:touch;-ms-overflow-style:-ms-autohiding-scrollbar;width:100%;}
+    .table-responsive table{width:100%;min-width:auto;max-width:100%;border-collapse:collapse;}
+    .table-responsive table th,
+    .table-responsive table td{word-break:break-word;white-space:normal;}
+    .table-responsive table td:last-child,
+    .table-responsive table th:last-child{min-width:80px;}
+    .dashboard-grid{grid-template-columns:1fr;}
+    .cards-grid{grid-template-columns:1fr;}
+    #view-table input,#view-table button{width:100%;max-width:100%;box-sizing:border-box;display:block;margin-bottom:10px;}
+    #view-addEmployee input,#view-addEmployee button{width:100%;max-width:100%;box-sizing:border-box;display:block;}
+    #view-addEmployee input{margin-bottom:10px;}
+    #view-addEmployee button{margin-top:10px;}
+    #globalHistoryContent, #globalHistoryContent p{word-break:break-word;white-space:normal;}
+    .view-section{overflow-x:hidden;}
     /* Side-drawer should not occupy full screen on tablets/phones */
     .side-drawer{width:0}
 }
@@ -119,8 +137,8 @@ button:hover{background:#162d66;}
 .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:15px;margin-top:20px;}
 .employee-card{background:#fff;border:1px solid #ddd;border-radius:8px;padding:15px;text-align:center;box-shadow:0 2px 5px rgba(0,0,0,0.05);}
 .employee-card img{width:70px;height:70px;border-radius:50%;object-fit:cover;margin-bottom:10px;}
-table{width:100%;border-collapse:collapse;margin-top:20px;}
-th,td{border:1px solid #ccc;padding:8px;text-align:center;}
+table{width:100%;max-width:100%;border-collapse:collapse;margin-top:20px;}
+th,td{border:1px solid #ccc;padding:8px;text-align:center;word-break:break-word;white-space:normal;}
 th{background:#1e3a8a;color:white;}
 .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:2500;}
 .modal-content{background:white;margin:100px auto;padding:20px;width:90%;max-width:600px;border-radius:10px;max-height:80vh;overflow-y:auto;}
@@ -142,7 +160,8 @@ th{background:#1e3a8a;color:white;}
     font-family: "Times New Roman", Times, serif;
 }
 .facture-scope .document-a4 {
-    width: 210mm;
+    width: min(210mm, 100%);
+    max-width: 100%;
     min-height: 297mm;
     background: white;
     padding: 20mm 15mm 25mm 15mm;
@@ -317,6 +336,47 @@ th{background:#1e3a8a;color:white;}
     font-weight: bold;
     line-height: 1.4;
 }
+@media (max-width: 768px) {
+    .facture-scope {padding:16px;}
+    .facture-scope .document-a4 {padding:16px;min-height:auto;}
+    .facture-scope .header-table, .facture-scope .header-table tr, .facture-scope .header-table td {width:100%;display:block;}
+    .facture-scope .header-table td {padding:0;}
+    .facture-scope .header svg {width:80px;height:80px;}
+    .facture-scope .company-name {font-size:28px;}
+    .facture-scope .activities {font-size:12px;line-height:1.45;}
+    .facture-scope .info-section {text-align:left;margin-bottom:14px;}
+    .facture-scope .date {font-size:13px;}
+    .facture-scope .client-box-wrapper {text-align:left;margin-top:10px;}
+    .facture-scope .client-box {display:block;width:100%;border-width:2px;font-size:16px;padding:8px 10px;min-width:0;}
+    .facture-scope .document-title {font-size:18px;}
+    .facture-scope .document-subject {font-size:13px;line-height:1.5;margin-bottom:14px;text-align:left;}
+    .facture-scope .data-table {font-size:13px;width:100%;}
+    .facture-scope .data-table thead {display:none;}
+    .facture-scope .data-table tr {display:block;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:12px;overflow:hidden;background:#fafafa;}
+    .facture-scope .data-table td {display:flex;justify-content:space-between;align-items:flex-start;padding:10px 12px;border-bottom:1px solid #e5e7eb;position:relative;}
+    .facture-scope .data-table td:last-child {border-bottom:none;}
+    .facture-scope .data-table td::before {content:attr(data-label);width:40%;flex:0 0 40%;font-weight:700;color:#166e36;white-space:normal;word-break:break-word;}
+    .facture-scope .data-table td span{display:block;width:58%;text-align:right;word-break:break-word;}
+    .facture-scope .data-table td:last-child span {text-align:right;}
+    .facture-scope .data-table td[colspan] {display:flex;flex-direction:column;border-bottom:1px solid #e5e7eb;}
+    .facture-scope .data-table td[colspan]::before {content:'';}
+    .facture-scope .amount-words {font-size:13px;margin-top:12px;padding-left:0;}
+    .facture-scope .stamp-section {margin-right:0;text-align:left;}
+    .facture-scope .stamp-image {width:160px;}
+    .facture-scope .footer {position:static;left:auto;right:auto;border:none;border-top:2px solid #166e36;border-bottom:none;padding-top:12px;font-size:11px;}
+}
+@media (max-width: 480px) {
+    .facture-scope {padding:12px;}
+    .facture-scope .document-a4 {padding:12px;}
+    .facture-scope .company-name {font-size:24px;}
+    .facture-scope .activities {font-size:11px;}
+    .facture-scope .client-box {font-size:15px;padding:6px 8px;}
+    .facture-scope .document-title {font-size:16px;}
+    .facture-scope .document-subject {font-size:12px;}
+    .facture-scope .data-table td {padding:9px 10px;}
+    .facture-scope .stamp-image {width:140px;}
+    .facture-scope .footer {font-size:10px;}
+}
 @media print {
     body {
         background-color: white;
@@ -413,7 +473,6 @@ th{background:#1e3a8a;color:white;}
     <div id="drawerAdminControls" class="drawer-admin" style="display:none;">
         <div id="drawerUserBadges"></div>
         <div style="margin-top:6px;">
-            <button id="drawerAdminButton" onclick="openAdminModal()">Connexion Admin</button>
             <button id="drawerLoginButton" onclick="openLoginModal()">Se connecter</button>
             <button id="drawerThemeBtn" onclick="toggleTheme()">Mode sombre</button>
             <button id="drawerAdminLogout" onclick="logoutAdmin()" style="display:none;">Déconnexion Admin</button>
@@ -569,7 +628,7 @@ Photo <input type="file" id="photo" accept="image/*"><br>
                 </thead>
                 <tbody>
                     <tr>
-                        <td class="designation-col" contenteditable="true">
+                        <td class="designation-col" contenteditable="true" data-label="Désignation">
                             Vidange, débouchage et curage y compris toutes<br>
                             sujétions de :<br>
                             02 fosses septiques,<br>
@@ -577,10 +636,10 @@ Photo <input type="file" id="photo" accept="image/*"><br>
                             03 regards<br>
                             <br><br><br>
                         </td>
-                        <td class="center-col" contenteditable="true">U</td>
-                        <td class="center-col" contenteditable="true">01</td>
-                        <td class="center-col" contenteditable="true">250 000</td>
-                        <td class="center-col" contenteditable="true">250 000</td>
+                        <td class="center-col" contenteditable="true" data-label="U">U</td>
+                        <td class="center-col" contenteditable="true" data-label="Quantité">01</td>
+                        <td class="center-col" contenteditable="true" data-label="Prix unitaire">250 000</td>
+                        <td class="center-col" contenteditable="true" data-label="Montant">250 000</td>
                     </tr>
                     <tr>
                         <td colspan="4" class="right-col">MONTANT HT</td>
@@ -604,7 +663,6 @@ Photo <input type="file" id="photo" accept="image/*"><br>
                     </tr>
                 </tbody>
             </table>
-            </div>
 
             <div class="amount-words">
                 <strong>Arrêté le présent devis à la somme de : <span contenteditable="true">DEUX CENT SOIXANTE ONZE MILLE QUATRE CENT<br>FRANCS CFA</span></strong>
@@ -813,15 +871,12 @@ function updateAdminUI(){
     const drawer = document.getElementById('drawerAdminControls');
     if(drawer){
         const dUserBadges = document.getElementById('drawerUserBadges');
-        const dAdminBtn = document.getElementById('drawerAdminButton');
         const dLoginBtn = document.getElementById('drawerLoginButton');
         const dThemeBtn = document.getElementById('drawerThemeBtn');
         const dAdminLogout = document.getElementById('drawerAdminLogout');
         const dUserLogout = document.getElementById('drawerUserLogout');
-        // Show drawer controls only on narrow screens
-        drawer.style.display = window.innerWidth <= 600 ? 'block' : 'none';
+        drawer.style.display = 'block';
         if(dUserBadges) dUserBadges.innerHTML = email ? `<span class="badge">${email}</span>` : '';
-        if(dAdminBtn) dAdminBtn.style.display = (!loggedIn || isAdmin()) ? 'inline-block' : 'none';
         if(dLoginBtn) dLoginBtn.style.display = loggedIn ? 'none' : 'inline-block';
         if(dAdminLogout) dAdminLogout.style.display = isAdmin() ? 'inline-block' : 'none';
         if(dUserLogout) dUserLogout.style.display = loggedIn ? 'inline-block' : 'none';
@@ -886,6 +941,10 @@ function toggleTheme(){
     localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
     const btn = document.getElementById('themeToggleBtn');
     if(btn) btn.textContent = isDark ? 'Mode clair' : 'Mode sombre';
+    const drawerBtn = document.getElementById('drawerThemeBtn');
+    if(drawerBtn) drawerBtn.textContent = isDark ? 'Mode clair' : 'Mode sombre';
+    const drawerLink = document.getElementById('drawerThemeLink');
+    if(drawerLink) drawerLink.textContent = isDark ? '🌓 Mode clair' : '🌓 Mode sombre';
 }
 
 function openAdminModal(){
